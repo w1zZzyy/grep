@@ -1,6 +1,7 @@
 #[allow(dead_code)]
 
 mod input;
+mod output;
 
 fn main() {
     let args = input::Arguments::new();
