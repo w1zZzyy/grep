@@ -1,21 +1,21 @@
+use crate::output::OutputFormat;
 use std::fs;
 use std::io;
 use std::io::Write;
 use std::collections::HashMap;
 
 pub trait OutputTarget {
-    fn load(&self, data : &HashMap<String, Vec<String>>) -> io::Result<()>;
+    fn load(&self, data : &HashMap<String, Vec<OutputFormat>>) -> io::Result<()>;
 }
 
-fn parse_lines(lines : &Vec<String>) -> String {
+fn parse_lines(lines : &Vec<OutputFormat>) -> String {
     lines
         .iter()
-        .enumerate()
-        .map(|item| format!("\t{}) {}\n", item.0 + 1, item.1))
+        .map(|item| format!("\t{}) {}\n", item.num, item.line))
         .collect::<String>()
 }
 
-fn parse_file(path: &str, lines: &Vec<String>) -> Option<String> {
+fn parse_file(path: &str, lines: &Vec<OutputFormat>) -> Option<String> {
     if lines.is_empty() {
         None
     } else {
@@ -41,7 +41,7 @@ impl FileOutput {
 }
 
 impl OutputTarget for FileOutput {
-    fn load(&self, data : &HashMap<String, Vec<String>>) -> io::Result<()> {
+    fn load(&self, data : &HashMap<String, Vec<OutputFormat>>) -> io::Result<()> {
         let mut file = fs::OpenOptions::new()
             .write(true)
             .append(true)
@@ -65,7 +65,7 @@ impl TerminalOutput {
 }
 
 impl OutputTarget for TerminalOutput {
-    fn load(&self, data : &HashMap<String, Vec<String>>) -> io::Result<()> {
+    fn load(&self, data : &HashMap<String, Vec<OutputFormat>>) -> io::Result<()> {
         for (path, lines) in data {
             if let Some(parsed) = parse_file(path, lines) {
                 println!("{}", parsed);

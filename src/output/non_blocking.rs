@@ -1,8 +1,8 @@
-use crate::output::{io::IO, OutputTarget};
+use crate::output::{io::IO, OutputTarget, OutputFormat};
 use std::collections::HashMap;
 
 pub struct NonBlockingOutput<T: OutputTarget> {
-    results : HashMap<String, Vec<String>>,
+    results : HashMap<String, Vec<OutputFormat>>,
     target : T
 }
 impl<T: OutputTarget> NonBlockingOutput<T> {
@@ -12,7 +12,7 @@ impl<T: OutputTarget> NonBlockingOutput<T> {
 }
 
 impl<T: OutputTarget> IO for NonBlockingOutput<T> {
-    fn write(&mut self, path : &str, mut lines : Vec<String>) {
+    fn write(&mut self, path : &str, mut lines : Vec<OutputFormat>) {
         self.results.entry(path.to_string())
                     .or_insert_with(|| Vec::new())
                     .append(&mut lines);
@@ -25,14 +25,17 @@ impl<T: OutputTarget> IO for NonBlockingOutput<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::output::{FileOutput, NonBlockingOutput, io::IO};
-    use std::{collections::HashMap, fmt::format, fs, io::Read};
+    use crate::output::{FileOutput, NonBlockingOutput, OutputFormat, io::IO};
+    use std::{collections::HashMap, fmt::format, fs, io::Read, process::Output};
 
     #[test]
     fn file_load() {
         let g_path : String = "file_load.txt".into();
-        let data : HashMap<String, Vec<String>> = [
-            ("file1".to_string(), vec!["aboba".into(), "bob".into()]),
+        let data : HashMap<String, Vec<OutputFormat>> = [
+            ("file1".to_string(), vec![
+                OutputFormat::new(2, "aboba".into()), 
+                OutputFormat::new(32, "bob".into())
+            ]),
             ("file2".to_string(), vec![]),
         ].into_iter().collect();
 
@@ -51,8 +54,8 @@ mod tests {
             "::::File: file1::::\n\
             - Patterns found: 2\n\
             - Lines:\n\
-            \t1) aboba\n\
-            \t2) bob\n\
+            \t2) aboba\n\
+            \t32) bob\n\
             ****************************\n\n"
         );
 

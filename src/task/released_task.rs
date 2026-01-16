@@ -1,6 +1,6 @@
 use std::usize;
 
-use crate::output::IO;
+use crate::output::{IO, OutputFormat};
 use crate::task::execute::*;
 use async_trait::async_trait;
 use tokio::io::{AsyncBufReadExt, AsyncReadExt};
@@ -31,11 +31,12 @@ impl<'a, 'b, T: IO> ReleasedTask<'a, 'b, T> {
 impl<'a, 'b, T: IO> Executable for ReleasedTask<'a, 'b, T> {
     async fn execute(&mut self) -> std::io::Result<()> {
         if let Some(output) = self.output.as_deref_mut() {
-            let lines : Vec<String> = 
+            let lines : Vec<OutputFormat> = 
                 self.text
                     .lines() 
-                    .filter(|line| line.contains(self.pattern))
-                    .map(|line| line.to_string())
+                    .enumerate()
+                    .filter(|s| s.1.contains(self.pattern))
+                    .map(|s| OutputFormat::new(s.0 + 1, s.1.to_string()))
                     .collect();
 
             output.write(&self.path, lines);
