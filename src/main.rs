@@ -2,6 +2,7 @@
 
 mod input;
 mod output;
+mod task;
 
 fn main() {
     let args = input::Arguments::new();
