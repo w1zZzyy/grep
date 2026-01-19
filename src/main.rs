@@ -1,3 +1,6 @@
 mod lib;
 
-fn main() {}
+fn main() {
+    let mut engine = lib::Engine::new();
+    engine.run();
+}

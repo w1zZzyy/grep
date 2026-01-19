@@ -43,7 +43,7 @@ enum ArgType {
 
 fn extract<T: FromStr>(_args: &HashMap<String, String>, _key_type: ArgType) -> Option<T> {
     let key = match _key_type {
-        ArgType::OutputPath => "--output_path",
+        ArgType::OutputPath => "--output",
         ArgType::Threads => "--threads",
     };
 
